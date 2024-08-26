@@ -1,0 +1,31 @@
+{
+  "name": "link-up",
+  "version": "1.0.0",
+  "description": "social media app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SiphoChris/LinkUp.git"
+  },
+  "keywords": [
+    "Social",
+    "Media"
+  ],
+  "author": "Sipho Nkebe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SiphoChris/LinkUp/issues"
+  },
+  "homepage": "https://github.com/SiphoChris/LinkUp#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0"
+  }
+}
