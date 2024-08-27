@@ -7,6 +7,16 @@ const routes = [
     name: 'home',
     component: HomeView
   },
+  {
+    path: '/messages',
+    name: 'messages',
+    component: () => import('../views/DirectMessagesView.vue')
+  },
+  {
+    path: '/profile',
+    name: 'prodile',
+    component: () => import('../views/ProfileView.vue')
+  },
 ]
 
 const router = createRouter({
