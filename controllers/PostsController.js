@@ -6,7 +6,7 @@ const postRouter = Router();
 const post = new Posts();
 
 // Public routes
-postRouter.get('/', async (req, res) => {
+postRouter.get('/all', async (req, res) => {
     const result = await post.getPosts();
     if (result.success) {
         res.status(200).json(result.result);
@@ -26,7 +26,7 @@ postRouter.get('/:id', async (req, res) => {
 });
 
 // Private routes
-postRouter.post('/', verifyAToken, async (req, res) => {
+postRouter.post('/create', verifyAToken, async (req, res) => {
     const { title, content } = req.body;
     const result = await post.createPost({ title, content });
     if (result.success) {
@@ -36,7 +36,7 @@ postRouter.post('/', verifyAToken, async (req, res) => {
     }
 });
 
-postRouter.delete('/:id', verifyAToken, async (req, res) => {
+postRouter.delete('/delete/:id', verifyAToken, async (req, res) => {
     const { id } = req.params;
     const result = await post.deletePost(id);
     if (result.success) {
@@ -46,7 +46,7 @@ postRouter.delete('/:id', verifyAToken, async (req, res) => {
     }
 });
 
-postRouter.patch('/:id', verifyAToken, async (req, res) => {
+postRouter.patch('/update/:id', verifyAToken, async (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
     const result = await post.updatePost(id, { title, content });

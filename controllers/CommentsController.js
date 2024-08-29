@@ -1,13 +1,12 @@
+import { Router } from "express";
 import { verifyAToken } from "../middlewares/Auth.js";
-import {Router} from "express";
 import { Comments } from "../models/Comments.js";
 
 const commentRouter = Router();
 const comment = new Comments();
 
-// public routes
-
-commentRouter.get('/', async (req, res) => {
+// Public routes
+commentRouter.get('/all', async (req, res) => {
     const result = await comment.getComments();
     if (result.success) {
         res.status(200).json(result.result);
@@ -26,12 +25,10 @@ commentRouter.get('/:id', async (req, res) => {
     }
 });
 
-
-// private routes
-
-commentRouter.post('/', verifyAToken, async (req, res) => {
-    const { content, post_id } = req.body;
-    const result = await comment.createComment({ content, post_id });
+// Private routes
+commentRouter.post('/create', verifyAToken, async (req, res) => {
+    const { content, post_id, user_id } = req.body;
+    const result = await comment.createComment({ content, post_id, user_id });
     if (result.success) {
         res.status(201).json(result.result);
     } else {
@@ -39,8 +36,7 @@ commentRouter.post('/', verifyAToken, async (req, res) => {
     }
 });
 
-
-commentRouter.patch('/:id', verifyAToken, async (req, res) => {
+commentRouter.patch('/update/:id', verifyAToken, async (req, res) => {
     const { id } = req.params;
     const { content } = req.body;
     const result = await comment.updateComment(id, { content });
@@ -51,8 +47,7 @@ commentRouter.patch('/:id', verifyAToken, async (req, res) => {
     }
 });
 
-
-commentRouter.delete('/:id', verifyAToken, async (req, res) => {
+commentRouter.delete('/delete/:id', verifyAToken, async (req, res) => {
     const { id } = req.params;
     const result = await comment.deleteComment(id);
     if (result.success) {
@@ -63,5 +58,3 @@ commentRouter.delete('/:id', verifyAToken, async (req, res) => {
 });
 
 export default commentRouter;
-
-

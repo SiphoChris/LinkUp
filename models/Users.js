@@ -4,10 +4,10 @@ import { hash, compare } from "bcrypt";
 
 export class Users {
   async getAllUsers() {
-    const queryString = `SELECT * FROM Users`;
+    const queryString = 'SELECT * FROM Users';
     try {
-      const [result] = await db.execute(queryString);
-      return { success: true, result };
+      const [rows] = await db.execute(queryString);
+      return { success: true, result: rows };
     } catch (err) {
       console.error("Error getting all users:", err);
       return { success: false, message: err.message };
@@ -15,13 +15,13 @@ export class Users {
   }
 
   async getUserById(id) {
-    const queryString = `SELECT * FROM Users WHERE id = ?`;
+    const queryString = 'SELECT * FROM Users WHERE user_id = ?';
     try {
-      const [result] = await db.execute(queryString, [id]);
-      if (result.length === 0) {
+      const [rows] = await db.execute(queryString, [id]);
+      if (rows.length === 0) {
         return { success: false, message: "User not found" };
       }
-      return { success: true, result };
+      return { success: true, result: rows[0] };
     } catch (err) {
       console.error("Error getting user by ID:", err);
       return { success: false, message: err.message };
@@ -29,12 +29,12 @@ export class Users {
   }
 
   async createUser(user) {
-    const queryString = `INSERT INTO Users (username, email, password) VALUES (?, ?, ?)`;
+    const queryString = 'INSERT INTO Users (username, email, password_hash) VALUES (?, ?, ?)';
     try {
       const hashedPassword = await hash(user.password, 10);
       const values = [user.username, user.email, hashedPassword];
       const [result] = await db.execute(queryString, values);
-      return { success: true, result };
+      return { success: true, result: { id: result.insertId } };
     } catch (err) {
       console.error("Error creating user:", err);
       return { success: false, message: err.message };
@@ -42,19 +42,19 @@ export class Users {
   }
 
   async loginUser(user) {
-    const queryString = `SELECT * FROM Users WHERE email = ?`;
+    const queryString = 'SELECT * FROM Users WHERE email = ?';
     try {
-      const [result] = await db.execute(queryString, [user.email]);
-      if (result.length === 0) {
+      const [rows] = await db.execute(queryString, [user.email]);
+      if (rows.length === 0) {
         return { success: false, message: "User not found" };
       }
 
-      const isMatch = await compare(user.password, result[0].password);
+      const isMatch = await compare(user.password, rows[0].password_hash);
       if (!isMatch) {
         return { success: false, message: "Incorrect password" };
       }
 
-      const token = createToken(result[0]);
+      const token = createToken(rows[0]);
       return { success: true, token };
     } catch (err) {
       console.error("Error logging in user:", err);
@@ -63,10 +63,13 @@ export class Users {
   }
 
   async deleteUser(id) {
-    const queryString = `DELETE FROM Users WHERE id = ?`;
+    const queryString = 'DELETE FROM Users WHERE user_id = ?';
     try {
       const [result] = await db.execute(queryString, [id]);
-      return { success: true, result };
+      if (result.affectedRows === 0) {
+        return { success: false, message: 'User not found' };
+      }
+      return { success: true, result: { id } };
     } catch (err) {
       console.error("Error deleting user:", err);
       return { success: false, message: err.message };
@@ -74,18 +77,21 @@ export class Users {
   }
 
   async updateUser(id, user) {
-    let queryString = `UPDATE Users SET username = ?, email = ? WHERE id = ?`;
+    let queryString = 'UPDATE Users SET username = ?, email = ? WHERE user_id = ?';
     let values = [user.username, user.email, id];
 
     if (user.password) {
       const hashedPassword = await hash(user.password, 10);
-      queryString = `UPDATE Users SET username = ?, email = ?, password = ? WHERE id = ?`;
+      queryString = 'UPDATE Users SET username = ?, email = ?, password_hash = ? WHERE user_id = ?';
       values = [user.username, user.email, hashedPassword, id];
     }
 
     try {
       const [result] = await db.execute(queryString, values);
-      return { success: true, result };
+      if (result.affectedRows === 0) {
+        return { success: false, message: 'User not found' };
+      }
+      return { success: true, result: { id } };
     } catch (err) {
       console.error("Error updating user:", err);
       return { success: false, message: err.message };
