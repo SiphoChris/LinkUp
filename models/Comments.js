@@ -5,6 +5,9 @@ export class Comments {
         const queryString = 'SELECT * FROM Comments';
         try {
             const [rows] = await db.execute(queryString);
+            if (rows.length === 0) {
+                return { success: false, message: 'No comments found' };
+            }
             return { success: true, result: rows };
         } catch (err) {
             console.error('Error fetching Comments:', err);
@@ -30,6 +33,9 @@ export class Comments {
         const queryString = 'INSERT INTO Comments (comment_text, post_id, user_id) VALUES (?, ?, ?)';
         try {
             const [result] = await db.execute(queryString, [comment.comment_text, comment.post_id, comment.user_id]);
+            if (result.affectedRows === 0) {
+                return { success: false, message: 'Failed to create comment' };
+            }
             return { success: true, result: { id: result.insertId } };
         } catch (err) {
             console.error('Error creating comment:', err);

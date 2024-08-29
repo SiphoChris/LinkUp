@@ -5,6 +5,9 @@ export class Posts {
         const queryString = 'SELECT * FROM Posts';
         try {
             const [rows] = await db.execute(queryString);
+            if (rows.length === 0) {
+                return { success: false, message: 'No posts found' };
+            }
             return { success: true, result: rows };
         } catch (err) {
             console.error('Error getting posts:', err);
@@ -30,6 +33,9 @@ export class Posts {
         const queryString = 'INSERT INTO Posts (content) VALUES (?)';
         try {
             const [result] = await db.execute(queryString, [post.content]);
+            if (result.affectedRows === 0) {
+                return { success: false, message: 'Failed to create post' };
+            }
             return { success: true, result: { id: result.insertId } };
         } catch (err) {
             console.error('Error creating post:', err);

@@ -1,11 +1,161 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkUp</title>
+    <title>Bloomly</title>
+    <style>
+        body{
+            text-align: center;
+        }
+        table{
+            border: 1px solid black;
+            border-collapse: collapse;
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        th, td{
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    
+    <h3>routes/end-points</h3>
+    <br>
+    <h4>all my users routes have a base route of /api/users</h4>
+    <br>
+    <h4>all my comments routes have a base route of /api/comments</h4>
+    <br>
+    <h4>all my posts routes have a base route of /api/posts</h4>
+    <br>
+    <h3><em>This is a best practice that I have picked up</em></h3>
+    <br>
+    <table>
+        <thead>
+            <th>HTTP method</th>
+            <th>Path</th>
+            <th>Description</th>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Get</td>
+                <td>/ (home)</td>
+                <td>gets the home page that displays the routes</td>
+            </tr>
+        </tbody>
+    </table>
+    <h1>users</h1>
+    <table>
+    <thead>
+        <th>HTTP method</th>
+        <th>Path</th>
+        <th>Description</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Get</td>
+            <td>/all</td>
+            <td>gets all the users</td>
+        </tr>
+        <tr>
+            <td>Get</td>
+            <td>/:id</td>
+            <td>gets a user by id</td>
+        </tr>
+        <tr>
+            <td>Post</td>
+            <td>/register</td>
+            <td>creates a new user</td>
+        </tr>
+        <tr>
+            <td>Post</td>
+            <td>/login</td>
+            <td>logs in a user</td>
+        </tr>
+        <tr>
+            <td>Patch</td>
+            <td>/update/:id</td>
+            <td>updates a user's data</td>
+        </tr>
+        <tr>
+            <td>Delete</td>
+            <td>/delete/:id</td>
+            <td>deletes a user by id</td>
+        </tr>
+    </tbody>
+</table>
+<h1>comments</h1>
+    <table>
+    <thead>
+        <th>HTTP method</th>
+        <th>Path</th>
+        <th>Description</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Get</td>
+            <td>/all</td>
+            <td>gets all the comments</td>
+        </tr>
+        <tr>
+            <td>Get</td>
+            <td>/:id</td>
+            <td>gets a single comment</td>
+        </tr>
+        <tr>
+            <td>Post</td>
+            <td>/create</td>
+            <td>creates a new comment</td>
+        </tr>
+        <tr>
+            <td>Patch</td>
+            <td>/update/:id</td>
+            <td>updates comment data</td>
+        </tr>
+        <tr>
+            <td>Delete</td>
+            <td>/delete/:id</td>
+            <td>deletes a comment by id</td>
+        </tr>
+    </tbody>
+</table>
+<h1>posts</h1>
+    <table>
+    <thead>
+        <th>HTTP method</th>
+        <th>Path</th>
+        <th>Description</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Get</td>
+            <td>/all</td>
+            <td>gets all the posts</td>
+        </tr>
+        <tr>
+            <td>Get</td>
+            <td>/:id</td>
+            <td>gets a single posts</td>
+        </tr>
+        <tr>
+            <td>Post</td>
+            <td>/create</td>
+            <td>creates a new posts</td>
+        </tr>
+        <tr>
+            <td>Patch</td>
+            <td>/update/:id</td>
+            <td>updates posts data</td>
+        </tr>
+        <tr>
+            <td>Delete</td>
+            <td>/delete/:id</td>
+            <td>deletes a posts by id</td>
+        </tr>
+    </tbody>
+</table>
 </body>
 </html>

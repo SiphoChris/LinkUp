@@ -23,7 +23,7 @@ server.use(express.static('./static'));
 server.use(routes);
 
 // Root path
-server.get('^/$|/eShop', (req, res) => {
+server.get('^/$', (req, res) => {
     res.status(200).sendFile(path.resolve('./static/html/index.html'));
 });
 

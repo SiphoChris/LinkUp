@@ -17,14 +17,15 @@ userRouter.post("/register", async (req, res) => {
 });
 
 userRouter.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const result = await user.loginUser({ email, password });
-  if (result.success) {
-    res.status(200).json(result.result);
-  } else {
-    res.status(500).json({ message: result.message });
-  }
-});
+    const { email, password } = req.body;
+    const result = await user.loginUser({ email, password });
+    if (result.success) {
+      res.status(200).json({ token: result.token });
+    } else {
+      res.status(401).json({ message: result.message });
+    }
+  });
+  
 
 // Protected routes
 userRouter.use(verifyAToken);
