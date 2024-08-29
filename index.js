@@ -24,10 +24,10 @@ server.use(routes);
 
 // Root path
 server.get('^/$', (req, res) => {
-    res.status(200).sendFile(path.resolve('./static/html/index.html'));
+    res.status(200).sendFile(path.join(__dirname, 'static', 'html', 'index.html'));
 });
 
-// 404 handler for undefined routes
+// 404 error handler for undefined routes
 server.get('*', (req, res) => {
     res.status(404).json({
         status: 404,

@@ -46,7 +46,7 @@ postRouter.delete('/delete/:id', verifyAToken, async (req, res) => {
     }
 });
 
-postRouter.patch('/update/:id', verifyAToken, async (req, res) => {
+postRouter.patch('/update/  :id', verifyAToken, async (req, res) => {
     const { id } = req.params;
     const { title, content } = req.body;
     const result = await post.updatePost(id, { title, content });

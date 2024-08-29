@@ -33,45 +33,47 @@ export class Users {
 
   async createUser(user) {
     const queryString =
-      "INSERT INTO Users (username, email, password_hash) VALUES (?, ?, ?)";
+      "INSERT INTO Users (username, email, user_role, password_hash) VALUES (?, ?, ?, ?)";
     try {
       const hashedPassword = await hash(user.password, 10);
-      const values = [user.username, user.email, hashedPassword];
+      const values = [user.username, user.email, user.role, hashedPassword];
       const [result] = await db.execute(queryString, values);
-
-      const token = createToken({ email: user.email, id: result.insertId });
-
+  
       if (result.affectedRows === 0) {
         return { success: false, message: "Failed to create user" };
       }
-
+  
+      const token = createToken({ email: user.email, role: user.role, id: result.insertId });
       return { success: true, result: { id: result.insertId, token } };
     } catch (err) {
       console.error("Error creating user:", err);
       return { success: false, message: err.message };
     }
   }
+  
 
-  async loginUser(user) {
-    const queryString = 'SELECT * FROM Users WHERE email = ?';
+  async loginUser(email, password, role) {
+    const queryString = "SELECT * FROM Users WHERE email = ?" + (role ? " AND user_role = ?" : "");
     try {
-      const [rows] = await db.execute(queryString, [user.email]);
+      const [rows] = await db.execute(queryString, role ? [email, role] : [email]);
       if (rows.length === 0) {
         return { success: false, message: "User not found" };
       }
   
-      const isMatch = await compare(user.password, rows[0].password_hash);
-      if (!isMatch) {
-        return { success: false, message: "Incorrect password" };
+      const user = rows[0];
+      const isPasswordValid = await compare(password, user.password_hash);
+      if (!isPasswordValid) {
+        return { success: false, message: "Invalid password" };
       }
   
-      const token = createToken(rows[0]);
+      const token = createToken({ email: user.email, role: user.user_role, id: user.user_id });
       return { success: true, token };
     } catch (err) {
-      console.error("Error logging in user:", err);
+      console.error("Error logging in:", err);
       return { success: false, message: err.message };
     }
   }
+  
   
 
   async deleteUser(id) {

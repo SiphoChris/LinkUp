@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyAToken } from "../middlewares/Auth.js";
+import { verifyAToken, roleAuth } from "../middlewares/Auth.js";
 import { Users } from "../models/Users.js";
 
 const userRouter = Router();
@@ -7,8 +7,8 @@ const user = new Users();
 
 // Public routes
 userRouter.post("/register", async (req, res) => {
-  const { username, email, password } = req.body;
-  const result = await user.createUser({ username, email, password });
+  const { username, email, password, role } = req.body;
+  const result = await user.createUser({ username, email, password, role });
   if (result.success) {
     res.status(201).json(result.result);
   } else {
@@ -16,21 +16,20 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
-userRouter.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    const result = await user.loginUser({ email, password });
-    if (result.success) {
-      res.status(200).json({ token: result.token });
-    } else {
-      res.status(401).json({ message: result.message });
-    }
-  });
+userRouter.post("/login",async (req, res) => {
+  const { email, password } = req.body;
+  const result = await user.loginUser(email, password);
+  if (result.success) {
+    res.status(200).json({ token: result.token });
+  } else {
+    res.status(401).json({ message: result.message });
+  }
+});
   
-
 // Protected routes
 userRouter.use(verifyAToken);
 
-userRouter.get("/all", async (req, res) => {
+userRouter.get("/all", roleAuth(["admin", "user"]), async (req, res) => { 
   const result = await user.getAllUsers();
   if (result.success) {
     res.status(200).json(result.result);
@@ -39,7 +38,7 @@ userRouter.get("/all", async (req, res) => {
   }
 });
 
-userRouter.get("/:id", async (req, res) => {
+userRouter.get("/:id", roleAuth(["admin", "user"]), async (req, res) => { 
   const { id } = req.params;
   const result = await user.getUserById(id);
   if (result.success) {
@@ -49,7 +48,7 @@ userRouter.get("/:id", async (req, res) => {
   }
 });
 
-userRouter.patch("/update/:id", async (req, res) => {
+userRouter.patch("/update/:id", roleAuth(["admin", "user"]), async (req, res) => { 
   const { id } = req.params;
   const { username, email, password } = req.body;
   const result = await user.updateUser(id, { username, email, password });
@@ -60,7 +59,7 @@ userRouter.patch("/update/:id", async (req, res) => {
   }
 });
 
-userRouter.delete("/delete/:id", async (req, res) => {
+userRouter.delete("/delete/:id", roleAuth(["admin", "user"]), async (req, res) => { 
   const { id } = req.params;
   const result = await user.deleteUser(id);
   if (result.success) {
