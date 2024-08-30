@@ -1,8 +1,8 @@
 import { db } from "../config/index.js";
-import { createToken } from "../middlewares/Auth.js";
 import { hash, compare } from "bcrypt";
 
 export class Users {
+  // Fetch all users
   async getAllUsers() {
     const queryString = "SELECT * FROM Users";
     try {
@@ -17,6 +17,7 @@ export class Users {
     }
   }
 
+  // Fetch user by ID
   async getUserById(id) {
     const queryString = "SELECT * FROM Users WHERE user_id = ?";
     try {
@@ -31,51 +32,48 @@ export class Users {
     }
   }
 
-  async createUser(user) {
-    const queryString =
-      "INSERT INTO Users (username, email, user_role, password_hash) VALUES (?, ?, ?, ?)";
+  // Create a new user
+
+  async createUser({ username, email, password }) {
+    if (!username || !email || !password) {
+      return { success: false, message: 'Missing required fields' };
+    }
+    
     try {
-      const hashedPassword = await hash(user.password, 10);
-      const values = [user.username, user.email, user.role, hashedPassword];
-      const [result] = await db.execute(queryString, values);
-  
+      const hashedPassword = await hash(password, 10);
+      const queryString = `INSERT INTO Users (username, email, user_role, password_hash) VALUES (?, ?, 'user', ?)`;
+      const [result] = await db.execute(queryString, [username, email, hashedPassword]);
+      
       if (result.affectedRows === 0) {
-        return { success: false, message: "Failed to create user" };
+        return { success: false, message: 'Failed to create user' };
       }
-  
-      const token = createToken({ email: user.email, role: user.role, id: result.insertId });
+      
+      const token = createToken({ id: result.insertId, email, role: 'user' });
+      
       return { success: true, result: { id: result.insertId, token } };
     } catch (err) {
-      console.error("Error creating user:", err);
+      console.error('Error creating user:', err);
       return { success: false, message: err.message };
     }
   }
-  
 
-  async loginUser(email, password, role) {
-    const queryString = "SELECT * FROM Users WHERE email = ?" + (role ? " AND user_role = ?" : "");
-    try {
-      const [rows] = await db.execute(queryString, role ? [email, role] : [email]);
-      if (rows.length === 0) {
-        return { success: false, message: "User not found" };
+  // Login a user
+
+  async loginUser(email, password) {
+    const queryString = `SELECT * FROM Users WHERE email = ?`;
+    const [users] = await db.execute(queryString, [email]);
+    const user = users[0];
+    if (user) {
+      const isMatch = await compare(password, user.password_hash);
+      if (isMatch) {
+        const token = createToken({ id: user.id, email, role: user.user_role });
+        return { success: true, result: { token } };
       }
-  
-      const user = rows[0];
-      const isPasswordValid = await compare(password, user.password_hash);
-      if (!isPasswordValid) {
-        return { success: false, message: "Invalid password" };
-      }
-  
-      const token = createToken({ email: user.email, role: user.user_role, id: user.user_id });
-      return { success: true, token };
-    } catch (err) {
-      console.error("Error logging in:", err);
-      return { success: false, message: err.message };
     }
+    return { success: false, message: 'Invalid credentials' };
   }
-  
-  
 
+  // Delete a user
   async deleteUser(id) {
     const queryString = "DELETE FROM Users WHERE user_id = ?";
     try {
@@ -90,6 +88,7 @@ export class Users {
     }
   }
 
+  // Update a user
   async updateUser(id, user) {
     let queryString =
       "UPDATE Users SET username = ?, email = ? WHERE user_id = ?";
