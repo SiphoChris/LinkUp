@@ -10,7 +10,7 @@ export class Comments {
             }
             return { success: true, result: rows };
         } catch (err) {
-            console.error('Error fetching Comments:', err);
+            console.error('Error getting comments:', err);
             return { success: false, message: err.message };
         }
     }
@@ -24,15 +24,15 @@ export class Comments {
             }
             return { success: true, result: rows[0] };
         } catch (err) {
-            console.error('Error fetching comment by ID:', err);
+            console.error('Error getting comment by ID:', err);
             return { success: false, message: err.message };
         }
     }
 
     async createComment(comment) {
-        const queryString = 'INSERT INTO Comments (comment_text, post_id, user_id) VALUES (?, ?, ?)';
+        const queryString = 'INSERT INTO Comments (post_id, content) VALUES (?, ?)';
         try {
-            const [result] = await db.execute(queryString, [comment.comment_text, comment.post_id, comment.user_id]);
+            const [result] = await db.execute(queryString, [comment.postId, comment.content]);
             if (result.affectedRows === 0) {
                 return { success: false, message: 'Failed to create comment' };
             }
@@ -44,9 +44,9 @@ export class Comments {
     }
 
     async updateComment(id, comment) {
-        const queryString = 'UPDATE Comments SET comment_text = ? WHERE comment_id = ?';
+        const queryString = 'UPDATE Comments SET content = ? WHERE comment_id = ?';
         try {
-            const [result] = await db.execute(queryString, [comment.comment_text, id]);
+            const [result] = await db.execute(queryString, [comment.content, id]);
             if (result.affectedRows === 0) {
                 return { success: false, message: 'Comment not found' };
             }
